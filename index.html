@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeds & Signals · tecnomilpa</title>
+<meta name="description" content="Seeds and Signals: community mesh networks across Turtle Island. Learn to build your own with Meshtastic and LoRa.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Instrument+Serif&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --black: #0D0D0D;
+    --near: #1A1815;
+    --brown: #3D3530;
+    --clay: #8B5E3C;
+    --terracotta: #C2703E;
+    --maiz: #D4A843;
+    --sand: #E8D5B7;
+    --bone: #F0E6D3;
+    --milk: #F7F1E8;
+    --green: #4A6741;
+    --green-pale: #E8EFE4;
+    --text: #2E2117;
+    --text-soft: #5C4A3A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    background: var(--milk);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.01em;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .hero {
+    background: var(--near);
+    color: var(--bone);
+    padding: 3rem 1.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(194,112,62,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(74,103,65,0.06) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .hero-top {
+    position: absolute;
+    top: 1.8rem; left: 1.5rem; right: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(240,230,211,0.35);
+    line-height: 1.8;
+    position: relative;
+  }
+  .hero-tag a { color: rgba(240,230,211,0.35); text-decoration: none; }
+  .hero-content { position: relative; max-width: 600px; }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(3rem, 9vw, 5rem);
+    font-weight: 400;
+    line-height: 0.95;
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.02em;
+    color: var(--bone);
+  }
+  .hero h1 .amp { color: var(--terracotta); }
+  .hero .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(240,230,211,0.45);
+    margin-bottom: 1.8rem;
+  }
+  .hero .intro {
+    font-size: 1.05rem;
+    color: rgba(240,230,211,0.7);
+    max-width: 500px;
+    line-height: 1.85;
+    margin-bottom: 0;
+  }
+
+  .stripe {
+    height: 6px;
+    background: linear-gradient(90deg, var(--terracotta), var(--maiz), var(--green), var(--clay));
+  }
+
+  section {
+    padding: 3rem 1.5rem;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .mono-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+  h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 400;
+    margin-bottom: 1.2rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--black);
+  }
+  p { margin-bottom: 1.1rem; }
+  p.big { font-size: 1.1rem; line-height: 1.9; color: var(--black); }
+
+  .img-slot {
+    background: var(--bone);
+    border: 2px dashed var(--sand);
+    border-radius: 8px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: var(--clay);
+    font-size: 0.85rem;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .img-slot img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+  }
+  .img-slot:has(img) .img-placeholder { display: none; }
+  .img-slot .img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .img-slot .img-emoji { font-size: 1.5rem; }
+  .img-slot .img-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .img-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin: 1.5rem 0;
+  }
+  .img-row .img-slot { min-height: 180px; margin: 0; }
+
+  .truths { margin: 2rem 0; }
+  .truth {
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    display: grid;
+    grid-template-columns: 2.8rem 1fr;
+    gap: 0.8rem;
+    align-items: start;
+  }
+  .truth:last-child { border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .truth-icon { font-size: 1.6rem; padding-top: 0.1rem; }
+  .truth h3 { font-size: 1.1rem; font-weight: 700; color: var(--black); margin-bottom: 0.3rem; }
+  .truth p { font-size: 0.95rem; color: var(--text-soft); margin: 0; }
+
+  .pull {
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    background: var(--bone);
+    border-left: 4px solid var(--terracotta);
+    border-radius: 0 8px 8px 0;
+  }
+  .pull p { font-size: 1.15rem; color: var(--black); line-height: 1.7; margin: 0; font-weight: 700; }
+
+  .dark-band {
+    background: var(--near);
+    color: var(--bone);
+    padding: 3rem 1.5rem;
+    position: relative;
+  }
+  .dark-band::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 80%, rgba(194,112,62,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .dark-band .inner { max-width: 680px; margin: 0 auto; position: relative; }
+  .dark-band h2 { color: var(--bone); }
+  .dark-band .mono-label { color: var(--terracotta); }
+  .dark-band p { color: rgba(240,230,211,0.75); }
+
+  .four-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin: 2rem 0;
+    background: rgba(240,230,211,0.1);
+  }
+  .four-cell { padding: 1.3rem; background: var(--near); }
+  .four-cell .emoji { font-size: 1.4rem; margin-bottom: 0.4rem; display: block; }
+  .four-cell .val { font-size: 1.05rem; font-weight: 700; color: var(--bone); margin-bottom: 0.1rem; }
+  .four-cell .lbl {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(240,230,211,0.4);
+  }
+
+  .earth-band {
+    background: var(--clay);
+    color: var(--bone);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+  }
+  .earth-band p { font-size: 1.1rem; font-weight: 700; color: var(--bone); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+  .guide { margin: 2rem 0; }
+  .g-step { padding: 2rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .g-step:first-child { border-top: 1px solid rgba(0,0,0,0.06); }
+  .g-head { display: flex; gap: 0.8rem; align-items: baseline; margin-bottom: 0.8rem; }
+  .g-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--terracotta);
+    flex-shrink: 0; padding-top: 0.2rem;
+  }
+  .g-step h3 { font-size: 1.25rem; font-weight: 700; color: var(--black); }
+  .g-body { padding-left: 2.8rem; }
+  .g-body p { font-size: 0.95rem; }
+
+  .corn-list { margin: 0.8rem 0 1.2rem; padding: 0; list-style: none; }
+  .corn-list li {
+    font-size: 0.95rem; color: var(--text);
+    margin-bottom: 0.7rem; padding-left: 2rem;
+    position: relative; line-height: 1.7;
+  }
+  .corn-list li::before { content: '🌽'; position: absolute; left: 0; top: 0.05rem; font-size: 0.95rem; }
+  .corn-list.seeds li::before { content: '🌱'; }
+  .corn-list.signal li::before { content: '📡'; }
+  .corn-list.tools li::before { content: '🔧'; }
+  .corn-list.check li::before { content: '✅'; }
+
+  .note {
+    background: var(--bone);
+    padding: 1.2rem 1.4rem; margin: 1.2rem 0;
+    font-size: 0.95rem; color: var(--text);
+    border-left: 4px solid var(--terracotta);
+    border-radius: 0 6px 6px 0; line-height: 1.75;
+  }
+  .note strong { color: var(--terracotta); }
+  .note.verde { border-left-color: var(--green); background: var(--green-pale); }
+  .note.verde strong { color: var(--green); }
+
+  .freq-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .freq-table th {
+    text-align: left; padding: 0.6rem 0.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--clay);
+    border-bottom: 2px solid var(--sand); font-weight: 700;
+  }
+  .freq-table td { padding: 0.55rem 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .freq-table a { color: var(--terracotta); text-decoration: underline; }
+
+  details { border-bottom: 1px solid rgba(0,0,0,0.08); }
+  details:first-of-type { border-top: 1px solid rgba(0,0,0,0.08); }
+  details summary {
+    padding: 1.1rem 0; font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; color: var(--black);
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: '+'; font-family: 'Space Mono', monospace;
+    font-size: 1rem; font-weight: 700; color: var(--sand); flex-shrink: 0;
+  }
+  details[open] summary::after { content: '×'; color: var(--terracotta); }
+  details .faq-inner { padding: 0 0 1.3rem; font-size: 0.95rem; color: var(--text); }
+  details .faq-inner p { margin-bottom: 0.6rem; }
+
+  .links { margin: 1.5rem 0; }
+  .link-row {
+    display: block; padding: 1.2rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    text-decoration: none; transition: padding-left 0.2s;
+  }
+  .link-row:first-child { border-top: 1px solid rgba(0,0,0,0.06); }
+  .link-row:hover { padding-left: 0.5rem; }
+  .link-row .l-title { font-size: 1.05rem; font-weight: 700; color: var(--black); }
+  .link-row .l-desc { font-size: 0.88rem; color: var(--text-soft); margin-top: 0.15rem; }
+  .link-row .l-url {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem; color: var(--terracotta);
+    margin-top: 0.25rem; display: block;
+  }
+
+  .closing {
+    background: var(--near); color: var(--bone);
+    padding: 4rem 1.5rem; text-align: center; position: relative;
+  }
+  .closing::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--terracotta), transparent);
+  }
+  .closing h2 {
+    color: var(--bone); max-width: 460px;
+    margin: 0 auto 1rem;
+    font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1.35;
+  }
+  .closing p { color: rgba(240,230,211,0.4); font-size: 0.9rem; max-width: 380px; margin: 0 auto; }
+  .closing .site {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.1em;
+    color: var(--terracotta); margin-top: 1.5rem; display: block;
+  }
+  .closing .site a { color: var(--terracotta); text-decoration: none; }
+
+  footer {
+    background: var(--black); color: rgba(240,230,211,0.25);
+    padding: 1.8rem 1.5rem; font-size: 0.72rem; text-align: center; line-height: 1.9;
+  }
+  footer a { color: var(--terracotta); text-decoration: underline; }
+
+  code {
+    font-family: 'Space Mono', monospace;
+    background: var(--bone); padding: 0.15em 0.4em;
+    font-size: 0.85em; color: var(--clay); border-radius: 3px;
+  }
+  .body-link { color: var(--terracotta); text-decoration: underline; }
+
+  .skip-link {
+    position: absolute; top: -100%; left: 1rem;
+    background: var(--terracotta); color: white;
+    padding: 0.5rem 1rem; z-index: 2000;
+    font-weight: 700; border-radius: 0 0 6px 6px; text-decoration: none;
+  }
+  .skip-link:focus { top: 0; }
+
+  a:focus-visible, summary:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+  @media (min-width: 640px) {
+    section { padding: 4rem 2rem; }
+    .hero { padding: 3rem 2.5rem 3rem; }
+    body { font-size: 1.08rem; }
+  }
+  @media (max-width: 480px) {
+    .four-grid { grid-template-columns: 1fr; }
+    .hero { min-height: 88vh; padding-bottom: 2rem; }
+    .img-row { grid-template-columns: 1fr; }
+    .g-body { padding-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="hero" role="banner">
+  <div class="hero-top">
+    <div class="hero-tag"><a href="https://tecnomilpa.net">tecnomilpa</a></div>
+    <div class="hero-tag" style="text-align:right">seeds &amp; signals</div>
+  </div>
+  <div class="hero-content">
+    <h1>Seeds <span class="amp">&amp;</span><br>Signals</h1>
+    <p class="subtitle">Tending Networks across Turtle Island</p>
+    <p class="intro">Our communities face shared struggles across Turtle Island and solidarity requires communication infrastructure we control. What do seeds and mesh networks have in common? Both carry information, move through relationships, and grow when shared.</p>
+  </div>
+</header>
+
+<div class="stripe" role="presentation"></div>
+
+<main id="main">
+
+<section aria-labelledby="idea-heading">
+  <span class="mono-label">The Idea</span>
+  <h2 id="idea-heading">Seeds are technology</h2>
+  <p class="big">The milpa is not a monoculture. Corn, beans, squash, and chilli grow together, each supporting the others. This is how we think about technology. Not extraction. Not efficiency. Reciprocity.</p>
+
+  <div class="img-slot" aria-label="Image placeholder">
+    <div class="img-placeholder">
+      <span class="img-emoji">🌽</span>
+      <span class="img-label">Your image: milpa, seeds, or community</span>
+    </div>
+  </div>
+
+  <div class="truths" role="list" aria-label="Three parallels between seeds and mesh networks">
+    <div class="truth" role="listitem">
+      <span class="truth-icon" aria-hidden="true">🧬</span>
+      <div>
+        <h3>Both carry information</h3>
+        <p>Seeds hold genetic memory, stories, names in our languages. Mesh nodes carry messages, coordinates, futures.</p>
+      </div>
+    </div>
+    <div class="truth" role="listitem">
+      <span class="truth-icon" aria-hidden="true">🤝</span>
+      <div>
+        <h3>Both move through relationships</h3>
+        <p>Seeds pass hand to hand, community to community. Mesh packets hop node to node, relay to relay.</p>
+      </div>
+    </div>
+    <div class="truth" role="listitem">
+      <span class="truth-icon" aria-hidden="true">🌿</span>
+      <div>
+        <h3>Both grow when shared</h3>
+        <p>A seed kept alone eventually dies. A single node is silent. Both come alive in networks of care.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pull" role="note">
+    <p>Seeds are ancestral technology. Mesh networks extend that logic into the digital world: infrastructure controlled by communities, not corporations.</p>
+  </div>
+</section>
+
+<div class="dark-band" role="region" aria-labelledby="tech-heading">
+  <div class="inner">
+    <span class="mono-label">The Technology</span>
+    <h2 id="tech-heading">What is Meshtastic?</h2>
+    <p class="big" style="color:rgba(240,230,211,0.85)">Free, open source software that turns small radio boards into a mesh network. Your messages hop device to device. No cell towers. No internet. No subscription. No surveillance.</p>
+    <p>It uses LoRa (Long Range) radio to send text messages several kilometres per hop. Chain devices together and coverage stretches tens of kilometres, community to community.</p>
+    <div class="four-grid" role="list" aria-label="Key facts">
+      <div class="four-cell" role="listitem">
+        <span class="emoji" aria-hidden="true">💰</span>
+        <div class="val">~$18 to $35 USD</div>
+        <div class="lbl">Per node</div>
+      </div>
+      <div class="four-cell" role="listitem">
+        <span class="emoji" aria-hidden="true">📱</span>
+        <div class="val">Phone app</div>
+        <div class="lbl">iOS and Android</div>
+      </div>
+      <div class="four-cell" role="listitem">
+        <span class="emoji" aria-hidden="true">🔓</span>
+        <div class="val">No licence needed</div>
+        <div class="lbl">Unlicensed bands</div>
+      </div>
+      <div class="four-cell" role="listitem">
+        <span class="emoji" aria-hidden="true">🌐</span>
+        <div class="val">Fully open source</div>
+        <div class="lbl">Firmware, apps, protocol</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="earth-band" role="note">
+  <p>Many of our communities have no reliable cell coverage. Solidarity across Turtle Island requires communication infrastructure we actually own. Mesh networks give us that.</p>
+</div>
+
+<section aria-labelledby="guide-heading">
+  <span class="mono-label">Complete Setup Guide</span>
+  <h2 id="guide-heading">Get your Heltec V3 running</h2>
+  <p>Everything you need. No coding. No special tools. About 15 minutes from unboxing to first message.</p>
+
+  <div class="guide">
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">01</span>
+        <h3>Gather your hardware</h3>
+      </div>
+      <div class="g-body">
+        <p>You need three things:</p>
+        <ul class="corn-list tools" role="list">
+          <li>A <strong>Heltec WiFi LoRa 32 V3</strong> board (most ship with a small LoRa antenna)</li>
+          <li>A <strong>USB C data cable</strong> (many cables only carry power, not data, so make sure yours actually transfers files)</li>
+          <li>A computer with <strong>Chrome or Edge</strong> browser</li>
+        </ul>
+        <p>Choose the right frequency for your region:</p>
+        <table class="freq-table" role="table" aria-label="Frequency by region">
+          <thead><tr><th scope="col">Region</th><th scope="col">Frequency</th></tr></thead>
+          <tbody>
+            <tr><td>Canada, US, Mexico</td><td>902 to 928 MHz (915 MHz)</td></tr>
+            <tr><td>Europe, UK</td><td>863 to 870 MHz (868 MHz)</td></tr>
+            <tr><td>Australia, New Zealand</td><td>915 to 928 MHz</td></tr>
+            <tr><td>Other regions</td><td><a href="https://meshtastic.org/docs/getting-started/">See meshtastic.org</a></td></tr>
+          </tbody>
+        </table>
+        <p>Search for <strong>"Heltec LoRa 32 V3"</strong> on Amazon, Rokland, or the Heltec store.</p>
+        <div class="img-slot" aria-label="Image placeholder: Heltec V3 board">
+          <div class="img-placeholder">
+            <span class="img-emoji">📦</span>
+            <span class="img-label">Your photo: the board and what comes in the box</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">02</span>
+        <h3>Attach the antenna first</h3>
+      </div>
+      <div class="g-body">
+        <div class="note">
+          <strong>⚠ This is critical.</strong> Always connect the antenna before you power on or plug in the board. Running a LoRa radio without an antenna can permanently damage the radio chip. The RF energy has nowhere to go and burns it out.
+        </div>
+        <p>Press the small U.FL connector firmly onto the antenna pin. You should feel it click. Route the wire so it does not strain the connector.</p>
+        <div class="img-row">
+          <div class="img-slot" aria-label="Image placeholder: antenna connector close up">
+            <div class="img-placeholder">
+              <span class="img-emoji">🔌</span>
+              <span class="img-label">Your photo: antenna connector close up</span>
+            </div>
+          </div>
+          <div class="img-slot" aria-label="Image placeholder: antenna attached to board">
+            <div class="img-placeholder">
+              <span class="img-emoji">📡</span>
+              <span class="img-label">Your photo: antenna attached</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">03</span>
+        <h3>Flash the Meshtastic firmware</h3>
+      </div>
+      <div class="g-body">
+        <p>The easiest method is the web flasher. Nothing to install. It runs in your browser.</p>
+        <ul class="corn-list check" role="list">
+          <li>Plug the Heltec V3 into your computer with the USB C data cable</li>
+          <li>Open <a class="body-link" href="https://flasher.meshtastic.org">flasher.meshtastic.org</a> in Chrome or Edge</li>
+          <li>Click <strong>Connect</strong> and select your device from the serial port list</li>
+          <li>If the device does not appear, install the <a class="body-link" href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">Silicon Labs CP210x driver</a></li>
+          <li>Select <strong>"Heltec WiFi LoRa 32 V3"</strong> from the device dropdown</li>
+          <li>Choose the <strong>Stable</strong> release</li>
+          <li>Click <strong>Flash</strong> and wait a few minutes. Do not unplug while it writes.</li>
+          <li>When it finishes, the Meshtastic logo appears on the OLED screen</li>
+        </ul>
+        <div class="img-row">
+          <div class="img-slot" aria-label="Image placeholder: web flasher screenshot">
+            <div class="img-placeholder">
+              <span class="img-emoji">💻</span>
+              <span class="img-label">Screenshot: web flasher connect screen</span>
+            </div>
+          </div>
+          <div class="img-slot" aria-label="Image placeholder: Meshtastic logo on device">
+            <div class="img-placeholder">
+              <span class="img-emoji">✨</span>
+              <span class="img-label">Your photo: Meshtastic logo on screen</span>
+            </div>
+          </div>
+        </div>
+        <div class="note verde">
+          <strong>Good to know:</strong> Safari and Firefox do not support Web Serial. You need Chrome or Edge for this step.
+        </div>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">04</span>
+        <h3>Get the phone app</h3>
+      </div>
+      <div class="g-body">
+        <p>Download the free Meshtastic app to configure and use your node:</p>
+        <ul class="corn-list signal" role="list">
+          <li><strong>Android:</strong> search "Meshtastic" in the <a class="body-link" href="https://play.google.com/store/apps/details?id=com.geeksville.mesh">Google Play Store</a></li>
+          <li><strong>iPhone and iPad:</strong> search "Meshtastic" in the <a class="body-link" href="https://apps.apple.com/app/meshtastic/id1586432531">Apple App Store</a></li>
+        </ul>
+        <div class="img-slot" aria-label="Image placeholder: Meshtastic app" style="min-height:180px">
+          <div class="img-placeholder">
+            <span class="img-emoji">📱</span>
+            <span class="img-label">Screenshot: Meshtastic app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">05</span>
+        <h3>Pair via Bluetooth</h3>
+      </div>
+      <div class="g-body">
+        <p>Open the Meshtastic app and it will scan for nearby devices. Your Heltec V3 appears with a name like <code>Meshtastic_XXXX</code>.</p>
+        <p>Tap to connect. The device screen shows a pairing code. Enter it in the app. If no code appears, try the default: <code>123456</code>.</p>
+        <div class="img-row">
+          <div class="img-slot" aria-label="Image placeholder: scanning for devices">
+            <div class="img-placeholder">
+              <span class="img-emoji">🔍</span>
+              <span class="img-label">Screenshot: scanning for devices</span>
+            </div>
+          </div>
+          <div class="img-slot" aria-label="Image placeholder: pairing code on screen">
+            <div class="img-placeholder">
+              <span class="img-emoji">🔑</span>
+              <span class="img-label">Your photo: pairing code on screen</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">06</span>
+        <h3>Set your region</h3>
+      </div>
+      <div class="g-body">
+        <div class="note">
+          <strong>⚠ Required before transmitting.</strong> The region setting controls which radio frequency your device uses. Using the wrong one may violate local regulations.
+        </div>
+        <p>In the app, go to <strong>Settings → Radio → Region</strong> and select your location. For the Americas (Canada, US, Mexico), choose <strong>US</strong> at 915 MHz. The device reboots after saving.</p>
+        <div class="img-slot" aria-label="Image placeholder: region settings" style="min-height:180px">
+          <div class="img-placeholder">
+            <span class="img-emoji">🗺</span>
+            <span class="img-label">Screenshot: region settings in the app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">07</span>
+        <h3>Name your node</h3>
+      </div>
+      <div class="g-body">
+        <p>In the app, go to <strong>Settings → User</strong>. Set your <strong>Long Name</strong> (what others see) and <strong>Short Name</strong> (four characters for small screens).</p>
+        <p>Use a seed name in your language. A community name. Something that matters to you.</p>
+      </div>
+    </div>
+
+    <div class="g-step">
+      <div class="g-head">
+        <span class="g-num">08</span>
+        <h3>Send your first message</h3>
+      </div>
+      <div class="g-body">
+        <p>Open the <strong>Messages</strong> tab. Type something. Send it. If another Meshtastic device is in range, your message hops through the mesh.</p>
+        <p>That is it. You are on the network. 🌱</p>
+        <div class="img-slot" aria-label="Image placeholder: messages on the mesh">
+          <div class="img-placeholder">
+            <span class="img-emoji">🌽</span>
+            <span class="img-label">Your photo: messages arriving on the mesh</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="stripe" role="presentation"></div>
+
+<section aria-labelledby="faq-heading">
+  <span class="mono-label">Common Questions</span>
+  <h2 id="faq-heading">Troubleshooting</h2>
+
+  <details>
+    <summary>My computer does not recognise the device</summary>
+    <div class="faq-inner">
+      <p>Make sure your USB C cable carries data, not just power. Many cables (especially short ones from battery packs) are power only. Try one you know works for file transfers.</p>
+      <p>If that is not the issue, install the <a class="body-link" href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">Silicon Labs CP210x driver</a>. On Mac, you may need to approve it under System Settings → Privacy &amp; Security.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>The web flasher will not connect</summary>
+    <div class="faq-inner">
+      <p>Use Chrome or Edge. Close any other app using the serial port (Arduino IDE, serial monitors, etc).</p>
+      <p>If it still will not connect, put the board into firmware download mode: unplug it, hold the <strong>USER</strong> button, plug it back in, release after two to three seconds.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>The screen shows "LoRa ERROR"</summary>
+    <div class="faq-inner">
+      <p>Normal before flashing. The factory program looks for another test device and shows this when it cannot find one. Flash Meshtastic firmware and it goes away.</p>
+      <p>If it persists after flashing, check the antenna connector is securely attached.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>I cannot see other nodes</summary>
+    <div class="faq-inner">
+      <p>Check that all devices share the same <strong>region</strong> and <strong>channel</strong>. The default channel works for discovery.</p>
+      <p>Verify antennas on every device. LoRa range depends on line of sight. Walls and buildings reduce it significantly.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>What frequency for the Americas?</summary>
+    <div class="faq-inner">
+      <p>Canada, the US, and Mexico share the 902 to 928 MHz band. Select <strong>"US"</strong> as your region in the Meshtastic app. When buying hardware, look for the 915 MHz version of the Heltec V3.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>How far can it reach?</summary>
+    <div class="faq-inner">
+      <p>Each hop covers about one to five kilometres depending on terrain and obstacles. With clear line of sight or elevated antennas, much further. Messages relay through up to seven hops by default, so a chain of nodes can span tens of kilometres.</p>
+    </div>
+  </details>
+</section>
+
+<section aria-labelledby="resources-heading">
+  <span class="mono-label">Go Deeper</span>
+  <h2 id="resources-heading">Resources</h2>
+
+  <div class="links" role="list">
+    <a class="link-row" href="https://meshtastic.org" target="_blank" rel="noopener" role="listitem">
+      <div class="l-title">Meshtastic</div>
+      <div class="l-desc">Official documentation, firmware, community</div>
+      <span class="l-url">meshtastic.org</span>
+    </a>
+    <a class="link-row" href="https://flasher.meshtastic.org" target="_blank" rel="noopener" role="listitem">
+      <div class="l-title">Web Flasher</div>
+      <div class="l-desc">Flash firmware from your browser, nothing to install</div>
+      <span class="l-url">flasher.meshtastic.org</span>
+    </a>
+    <a class="link-row" href="https://meshtastic.org/docs/getting-started/" target="_blank" rel="noopener" role="listitem">
+      <div class="l-title">Getting Started Guide</div>
+      <div class="l-desc">Full official walkthrough for all devices</div>
+      <span class="l-url">meshtastic.org/docs/getting-started</span>
+    </a>
+    <a class="link-row" href="https://heltec.org/project/wifi-lora-32-v3/" target="_blank" rel="noopener" role="listitem">
+      <div class="l-title">Heltec V3 Product Page</div>
+      <div class="l-desc">Specs, pinouts, manufacturer docs</div>
+      <span class="l-url">heltec.org</span>
+    </a>
+    <a class="link-row" href="https://meshtastic.org/docs/hardware/devices/heltec-automation/lora32/" target="_blank" rel="noopener" role="listitem">
+      <div class="l-title">Heltec V3 on Meshtastic Docs</div>
+      <div class="l-desc">Device specific firmware and flashing notes</div>
+      <span class="l-url">meshtastic.org/docs/hardware</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<div class="closing">
+  <h2>Seeds travel. Signals travel. We travel. Let's keep tending this network together.</h2>
+  <p>The network grows when we grow it together. Share this with your community.</p>
+  <a class="site" href="https://tecnomilpa.net">tecnomilpa.net</a>
+</div>
+
+<footer role="contentinfo">
+  <p>Seeds &amp; Signals is a <a href="https://tecnomilpa.net">tecnomilpa</a> project.</p>
+</footer>
+
+</body>
+</html>
